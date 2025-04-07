@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+</head>
+<body>
+  <h2>Выберите склад:</h2>
+  <select id="warehouseSelect">
+    <?!= warehousesHtml ?>
+  </select>
+  <br><br>
+  <button onclick="submitSelection()">Выбрать</button>
+
+  <script>
+    function submitSelection() {
+      // Получаем выбранный ID склада
+      const selectedId = document.getElementById("warehouseSelect").value;
+
+      // Передаем ID обратно в Google Apps Script
+      google.script.run.withSuccessHandler(() => {
+        google.script.host.close(); // Закрываем Sidebar после выбора
+      }).processSelectedWarehouseId(selectedId);
+    }
+  </script>
+</body>
+</html>
