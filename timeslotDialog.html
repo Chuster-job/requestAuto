@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    select { 
+      width: 100%; 
+      padding: 10px; 
+      margin: 15px 0; 
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .timeslot-info {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <h2>Выберите время поставки</h2>
+  
+  <select id="timeslotSelect" onchange="updateSelection()">
+    <option value="">-- Выберите таймслот --</option>
+    <? timeslots.forEach(slot => { ?>
+      <option value="<?= slot.value ?>">
+        <?= slot.label ?>
+      </option>
+    <? }); ?>
+  </select>
+  
+  <div id="timeslotInfo" class="timeslot-info"></div>
+  
+  <button id="confirmBtn" onclick="confirmSelection()" disabled>Подтвердить</button>
+  
+  <script>
+    function updateSelection() {
+      const select = document.getElementById("timeslotSelect");
+      const infoDiv = document.getElementById("timeslotInfo");
+      const btn = document.getElementById("confirmBtn");
+      
+      if (select.value) {
+        const selectedOption = select.options[select.selectedIndex];
+        infoDiv.textContent = "Длительность: " + selectedOption.getAttribute("data-duration");
+        btn.disabled = false;
+      } else {
+        infoDiv.textContent = "";
+        btn.disabled = true;
+      }
+    }
+    
+    function confirmSelection() {
+      const select = document.getElementById("timeslotSelect");
+      const timeslot = select.value;
+      
+      if (!timeslot) return;
+      
+      google.script.run
+        .withSuccessHandler(() => google.script.host.close())
+        .withFailureHandler(showError)
+        .saveSelectedTimeslot(
+          <?= row ?>,
+          <?= warehouseId ?>,
+          timeslot
+        );
+    }
+    
+    function showError(error) {
+      alert('Ошибка: ' + error.message);
+    }
+  </script>
+</body>
+</html>
